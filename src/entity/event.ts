@@ -1,4 +1,4 @@
-import { Ticket } from "./ticket";
+import { Ticket } from './ticket';
 
 export interface Event {
   id: number;
@@ -9,4 +9,4 @@ export interface Event {
   availableTickets: Ticket[];
   createdAt: Date;
   updatedAt: Date;
-};
+}
