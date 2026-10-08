@@ -1,32 +1,32 @@
-import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { knex } from 'knex';
-import dbConfig from './knexfile';
-import { createEventDAL } from './dal/events.dal';
-import { createTicketDAL } from './dal/tickets.dal';
-import { createGetEventsController } from './controllers/get-events';
-
-const Knex = knex(dbConfig.development);
-
-const eventDAL = createEventDAL(Knex);
-const TicketDAL = createTicketDAL(Knex);
+import { createGetEventsController } from './controllers/events';
+import { createGetSettingsController, createPostSettingsController } from './controllers/settings';
+import { ENV } from './lib/env';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.use('/health', (_req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.use('/events', createGetEventsController({ eventsDAL: eventDAL, ticketsDAL: TicketDAL }));
+app.get('/events', createGetEventsController());
 
-app.use('/', (_req, res) => {
-  res.json({ message: 'Hello API' });
+app.get('/settings', createGetSettingsController());
+
+app.post('/settings', createPostSettingsController());
+
+app.use((_req, res) => {
+  res.status(404).json({ error: 'Not Found' });
 });
 
-app.listen(3000, () => {
-  console.log('Server Started');
+app.use((_err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+
+app.listen(ENV.PORT, () => {
+  console.log(`Server Started on port ${ENV.PORT}`);
 });
