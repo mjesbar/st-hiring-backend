@@ -11,15 +11,20 @@ exports.seed = async function(knex) {
     })
   }
   const events = await knex('events').select('id')
+  const tickets = []
   for (const event of events) {
     // create a 500 allotment of tickets for this event
     for (let j = 0; j < 500; j++) {
-      await knex('tickets').insert({
+      tickets.push({
         event_id: event.id,
         status: faker.helpers.arrayElement(['available', 'sold', 'reserved']),
         type: 'general',
         price: 1000,
-      });
+      })
     }
+  }
+  // insert in chunks to stay under Postgres' parameter limit
+  await knex.batchInsert('tickets', tickets, 500)
+}
   }
 }
