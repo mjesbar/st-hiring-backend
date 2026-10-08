@@ -1,16 +1,16 @@
-import 'dotenv/config';
-import type { Knex } from "knex";
+import type { Knex } from 'knex';
+import { ENV } from './lib/env';
 
 const dbConfig: { [key: string]: Knex.Config } = {
   development: {
-    client: "postgresql",
+    client: 'postgresql',
     connection: {
-      host: process.env.DB_HOST ?? "localhost",
+      host: ENV.DB_HOST,
       ssl: false,
-      port: Number(process.env.DB_PORT ?? 5432),
-      user: process.env.DB_USER ?? "root",
-      password: process.env.DB_PASSWORD ?? "example",
-      database: process.env.DB_NAME ?? "seetickets",
+      port: ENV.DB_PORT,
+      user: ENV.DB_USER,
+      password: ENV.DB_PASSWORD,
+      database: ENV.DB_NAME,
     },
     pool: {
       min: 2,
@@ -25,7 +25,5 @@ const dbConfig: { [key: string]: Knex.Config } = {
     },
   },
 };
-
-module.exports = dbConfig;
 
 export default dbConfig;
