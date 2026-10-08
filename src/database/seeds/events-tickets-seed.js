@@ -26,5 +26,3 @@ exports.seed = async function(knex) {
   // insert in chunks to stay under Postgres' parameter limit
   await knex.batchInsert('tickets', tickets, 500)
 }
-  }
-}

@@ -1,4 +1,7 @@
-import 'dotenv/config';
+import path from 'path';
+import { config } from 'dotenv';
+
+config({ path: path.resolve(__dirname, '../../.env') });
 
 /** Validated, immutable environment configuration loaded once at startup. */
 export interface Env {
