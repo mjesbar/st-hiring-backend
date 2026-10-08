@@ -14,7 +14,7 @@
 
 - Scattered env vars: env vars were read ad hoc with fallbacks in `knexfile.ts`, `mongo.ts` and `index.ts`. Now all are loaded and validated once in `src/lib/env.ts` as `ENV`, and the service crashes at startup with a detailed list of missing vars.
 
-- `Ticket.status` entity field could be a lot of values, so the typesafe orm restriction was added. Possible values `available` or `unavailable`.
+- `Ticket.status` entity field could be a lot of values, so the typesafe orm restriction was added. Possible values `available`, `sold` or `reserved`.
 
 # Performance
 

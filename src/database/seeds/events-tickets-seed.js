@@ -1,6 +1,6 @@
-const { faker } = require('@faker-js/faker')
+const { faker } = require('@faker-js/faker');
 
-exports.seed = async function(knex) {
+exports.seed = async function (knex) {
   // create events and tickets for those events
   for (let i = 0; i < 100; i++) {
     await knex('events').insert({
@@ -8,10 +8,10 @@ exports.seed = async function(knex) {
       description: faker.lorem.paragraph(),
       date: faker.date.future(),
       location: faker.location.city(),
-    })
+    });
   }
-  const events = await knex('events').select('id')
-  const tickets = []
+  const events = await knex('events').select('id');
+  const tickets = [];
   for (const event of events) {
     // create a 500 allotment of tickets for this event
     for (let j = 0; j < 500; j++) {
@@ -20,9 +20,9 @@ exports.seed = async function(knex) {
         status: faker.helpers.arrayElement(['available', 'sold', 'reserved']),
         type: 'general',
         price: 1000,
-      })
+      });
     }
   }
   // insert in chunks to stay under Postgres' parameter limit
-  await knex.batchInsert('tickets', tickets, 500)
-}
+  await knex.batchInsert('tickets', tickets, 500);
+};

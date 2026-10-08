@@ -1,4 +1,4 @@
-export type TicketStatus = 'available' | 'unavailable';
+export type TicketStatus = 'available' | 'sold' | 'reserved';
 
 export interface Ticket {
   id: number;
