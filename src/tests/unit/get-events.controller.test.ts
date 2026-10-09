@@ -9,13 +9,16 @@ jest.mock('../../dal/events.dal', () => ({
 
 import { createEventDAL } from '../../dal/events.dal';
 
-const makeEvent = (id: number, availableTickets: Ticket[] = []): Event => ({
+const makeEvent = (id: number, tickets?: Ticket[]): Event => ({
   id,
   name: `event-${id}`,
   description: 'desc',
   location: 'city',
   date: new Date(),
-  availableTickets,
+  availableTickets: tickets?.length ?? 0,
+  soldTickets: 0,
+  reservedTickets: 0,
+  ...(tickets ? { tickets } : {}),
   createdAt: new Date(),
   updatedAt: new Date(),
 });
@@ -46,23 +49,34 @@ describe('createGetEventsController', () => {
 
   beforeEach(() => {
     (createEventDAL as jest.Mock).mockReturnValue(eventsDAL);
-    eventsDAL.getEvents.mockResolvedValue([makeEvent(1, [makeTicket(10, 1)]), makeEvent(2)]);
+    eventsDAL.getEvents.mockResolvedValue([makeEvent(1), makeEvent(2)]);
     eventsDAL.countEvents.mockResolvedValue(42);
   });
 
-  it('returns a bare array with pagination headers', async () => {
+  it('defaults includeTickets to false and returns counts', async () => {
     const res = makeRes();
     await createGetEventsController()({ query: { page: '2', pageSize: '10' } } as never, res as never, jest.fn());
 
-    expect(eventsDAL.getEvents).toHaveBeenCalledWith({ limit: 10, offset: 10, includeTickets: true });
+    expect(eventsDAL.getEvents).toHaveBeenCalledWith({ limit: 10, offset: 10, includeTickets: false });
     expect(res.set).toHaveBeenCalledWith('X-Total-Count', '42');
     expect(res.set).toHaveBeenCalledWith('X-Page', '2');
     expect(res.set).toHaveBeenCalledWith('X-Page-Size', '10');
     expect(res.set).toHaveBeenCalledWith('X-Total-Pages', '5');
     expect(res.json).toHaveBeenCalledWith([
-      expect.objectContaining({ id: 1, availableTickets: [expect.objectContaining({ id: 10 })] }),
-      expect.objectContaining({ id: 2, availableTickets: [] }),
+      expect.objectContaining({ id: 1, availableTickets: 0, soldTickets: 0, reservedTickets: 0 }),
+      expect.objectContaining({ id: 2 }),
     ]);
+  });
+
+  it('forwards includeTickets=true to the DAL', async () => {
+    eventsDAL.getEvents.mockResolvedValue([makeEvent(1, [makeTicket(10, 1)])]);
+    await createGetEventsController()(
+      { query: { includeTickets: 'true' } } as never,
+      makeRes() as never,
+      jest.fn(),
+    );
+
+    expect(eventsDAL.getEvents).toHaveBeenCalledWith({ limit: 20, offset: 0, includeTickets: true });
   });
 
   it('forwards validation errors to next', async () => {
