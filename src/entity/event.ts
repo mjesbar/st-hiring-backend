@@ -1,4 +1,4 @@
-import { Ticket } from "./ticket";
+import { Ticket } from './ticket';
 
 export interface Event {
   id: number;
@@ -6,7 +6,10 @@ export interface Event {
   date: Date;
   location: string;
   description: string;
-  availableTickets: Ticket[];
+  availableTickets: number;
+  soldTickets: number;
+  reservedTickets: number;
+  tickets?: Ticket[];
   createdAt: Date;
   updatedAt: Date;
-};
+}
