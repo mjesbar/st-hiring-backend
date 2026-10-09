@@ -1,5 +1,11 @@
 # Journal
 
+# Features
+
+- Ticket amount on `GET /events`: the `Event` entity now exposes `availableTickets`, `soldTickets` and `reservedTickets` as numbers, always returned. They are the per-status counts of the event's tickets, computed in the same query as the events page via `count(tickets.id) filter (where tickets.status = ...)` over a `leftJoin` + `groupBy events.id`. The old `availableTickets: Ticket[]` array was renamed to `tickets: Ticket[]` and is only included when `includeTickets=true` (all statuses), so the default payload carries just the three counts.
+
+- `includeTickets` defaults to `false` in the controller (`req.query.includeTickets === 'true'`), so consumers opt in to the ticket array.
+
 # Bugs
 
 - `N+1` query in `GET /events`: `src/controllers/events.ts` ran one `getTicketsByEvent` call per event. With 50 events that is 51 round trips. Fixed by joining and aggregating tickets in the events query itself, controlled by the `includeTickets` param of `getEvents`.
