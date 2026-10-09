@@ -10,9 +10,10 @@ export const createGetEventsController =
     try {
       const eventsDAL = createEventDAL(knex(dbConfig.development));
       const { page, pageSize, offset, limit } = parsePagination(req.query as Record<string, unknown>);
+      const includeTickets = req.query.includeTickets === 'true';
 
       const [events, total] = await Promise.all([
-        eventsDAL.getEvents({ limit, offset, includeTickets: true }),
+        eventsDAL.getEvents({ limit, offset, includeTickets }),
         eventsDAL.countEvents(),
       ]);
 
